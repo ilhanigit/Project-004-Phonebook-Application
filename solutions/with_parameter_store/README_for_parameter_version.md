@@ -11,16 +11,16 @@ To hide our sensitive data, we prefer to use parameter store. So Mysql Password,
 
 - Create parameter for `database master password`  :
 
- `Name`         : /clarusway/phonebook/password               
+ `Name`         : /database/phonebook/password               
  `Description`  : ---
  `Tier`         : Standard
  `Type`         : SecureString   (So AWS encrypts sensitive data using KMS)
  `Data type`    : text
- `Value`        : clarusway_1234
+ `Value`        : database_1234
 
 - Create parameter for `database username`  :
 
- `Name`         : /clarusway/phonebook/username             
+ `Name`         : /database/phonebook/username             
  `Description`  : ---
  `Tier`         : Standard
  `Type`         : String   (No encryption)
@@ -29,16 +29,16 @@ To hide our sensitive data, we prefer to use parameter store. So Mysql Password,
 
  - Create parameter for `database name`  :
 
- `Name`         : /clarusway/phonebook/dbname            
+ `Name`         : /database/phonebook/dbname            
  `Description`  : ---
  `Tier`         : Standard
  `Type`         : String   (No encryption)
  `Data type`    : text
- `Value`        : clarusway_phonebook 
+ `Value`        : database_phonebook
 
 - Create parameter for `Github TOKEN`  :
 
- `Name`         : /clarusway/phonebook/token             
+ `Name`         : /database/phonebook/token             
  `Description`  : ---
  `Tier`         : Standard
  `Type`         : SecureString   (So AWS encrypts sensitive data using KMS)
@@ -59,9 +59,9 @@ def get_ssm_parameters():
     ssm = boto3.client('ssm', region_name='us-east-1')
 
     # AWS SSM 
-    username_param = ssm.get_parameter(Name='/osvaldo/phonebook/username')
-    password_param = ssm.get_parameter(Name="/osvaldo/phonebook/password", WithDecryption=True)
-    dbname_param = ssm.get_parameter(Name="/clarusway/phonebook/dbname")
+    username_param = ssm.get_parameter(Name='/database/phonebook/username')
+    password_param = ssm.get_parameter(Name="/database/phonebook/password", WithDecryption=True)
+    dbname_param = ssm.get_parameter(Name="/database/phonebook/dbname")
 
     # Assign values to parameters 
     username = username_param['Parameter']['Value']
@@ -104,10 +104,10 @@ cursor = connection.cursor()
 ```
 MyDbname: 
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /clarusway/phonebook/dbname
+    Default: /database/phonebook/dbname
 MyDbusername:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /clarusway/phonebook/username
+    Default: /database/phonebook/username
 ```
 
 - Call them in 
@@ -118,13 +118,13 @@ MyDbusername:
 .
 .
 
-DBName:  !Ref MyDbname  #'{{resolve:ssm:/clarusway/phonebook/dbname:1}}'
+DBName:  !Ref MyDbname  #'{{resolve:ssm:/database/phonebook/dbname:1}}'
 DBSecurityGroups:
  - !Ref DBSecurityGroup 
 Engine: MySQL
 EngineVersion: 8.0.35 
-MasterUsername: !Ref MyDbusername #'{{resolve:ssm:/clarusway/phonebook/username:1}}'
-MasterUserPassword: '{{resolve:ssm-secure:/clarusway/phonebook/password:1}}'
+MasterUsername: !Ref MyDbusername #'{{resolve:ssm:/database/phonebook/username:1}}'
+MasterUserPassword: '{{resolve:ssm-secure:/database/phonebook/password:1}}'
 .
 .
 .
@@ -133,7 +133,7 @@ MasterUserPassword: '{{resolve:ssm-secure:/clarusway/phonebook/password:1}}'
 - Go the `userdata` section inside the `Launch Template `and chenge TOKEN:xxxxxxxxxxxxx to :
 
 ```
-TOKEN=$(aws --region=us-east-1 ssm get-parameter --name /clarusway/phonebook/token --with-decryption --query 'Parameter.Value' --output text)
+TOKEN=$(aws --region=us-east-1 ssm get-parameter --name /database/phonebook/token --with-decryption --query 'Parameter.Value' --output text)
 ```
 
 - So here we used 3 different ways to retrieve values. With CLI (TOKEN), Dynamic (masterpassword) and referring from parameter (username )

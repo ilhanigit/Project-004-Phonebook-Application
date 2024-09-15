@@ -132,7 +132,7 @@ Resources:
     Properties:
       DBSecurityGroupIngress: # Required
         - EC2SecurityGroupId: !GetAtt WebServerSecurityGroup.GroupId
-      GroupDescription: allow connection only from ec2 # Required
+      GroupDescription: allow connection only from EC2 # Required
 
   WebServerSecurityGroup:
     Type: AWS::EC2::SecurityGroup
